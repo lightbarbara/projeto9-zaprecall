@@ -1,6 +1,8 @@
-import { useState } from "react"
 import styled from "styled-components"
 import seta_virar from '../img/seta_virar.png'
+import icone_certo from '../img/icone_certo.png'
+import icone_erro from '../img/icone_erro.png'
+import icone_quase from '../img/icone_quase.png'
 
 function PerguntaFechada({pergunta, posicao, perguntas, setPerguntas}) {
 
@@ -10,32 +12,37 @@ function PerguntaFechada({pergunta, posicao, perguntas, setPerguntas}) {
                 perguntas[p].aberta = true
             } else {
                 perguntas[p].aberta = false
+                perguntas[p].mostraResposta = false
             }
         setPerguntas([...perguntas])
         }
     }
 
     return (
-        <PerguntaFechadaWrapper>
+        <PerguntaFechadaWrapper data-identifier="flashcard" pergunta={pergunta}>
             <p>Pergunta {posicao + 1}</p>
-            <ion-icon onClick={() => abrePergunta(posicao)} name='play-outline'></ion-icon>
+            {!pergunta.feita ? <ion-icon onClick={() => abrePergunta(posicao)} data-identifier="flashcard-show-btn" name='play-outline'></ion-icon> : (pergunta.acertou === true ? <img src={icone_certo} data-identifier="flashcard-status" alt='certo' /> : (pergunta.acertou === false ? <img src={icone_erro} data-identifier="flashcard-status" alt='erro' /> : <img src={icone_quase} data-identifier="flashcard-status" alt='quase' />))}
         </PerguntaFechadaWrapper>
     )
 }
 
-function Pergunta({pergunta, perguntas}) {
+function Pergunta({pergunta, perguntas, setPerguntas}) {
 
-    const [showAnswer, setShowAnswer] = useState(pergunta.mostraPergunta)
-    const [acertou, setAcertou] = useState(pergunta.acertou)
-
-    function viraPergunta() {
-        setShowAnswer(true)
+    function viraPergunta(indice) {
+        for (let p in perguntas) {
+            if (indice === perguntas[p].id) {
+                perguntas[p].mostraResposta = true
+            } else {
+                perguntas[p].mostraResposta = false
+            }
+        }
+        setPerguntas([...perguntas])
     }
 
     return (
-        <PerguntaAbertaWrapper>
-            {showAnswer ? pergunta.resposta : pergunta.pergunta}
-            {showAnswer ? '': <img onClick={viraPergunta} src={seta_virar} alt='seta' />}
+        <PerguntaAbertaWrapper data-identifier="flashcard-index-item">
+            {pergunta.mostraResposta ? <p data-identifier="flashcard-answer">{pergunta.resposta}</p> : <p data-identifier="flashcard-question">{pergunta.pergunta}</p>}
+            {pergunta.mostraResposta ? '': <img onClick={() => viraPergunta(pergunta.id)} data-identifier="flashcard-turn-btn" src={seta_virar} alt='seta' />}
         </PerguntaAbertaWrapper>
     )
 }
@@ -43,7 +50,7 @@ function Pergunta({pergunta, perguntas}) {
 export default function PerguntasContainer({perguntas, setPerguntas}) {
     return (
         <>
-            {perguntas.map((p, i) => p.aberta ? <Pergunta pergunta={p} perguntas={perguntas} /> : <PerguntaFechada pergunta={p} posicao={i} perguntas={perguntas} setPerguntas={setPerguntas} />)}
+            {perguntas.map((p, i) => p.aberta ? <Pergunta pergunta={p} perguntas={perguntas} setPerguntas={setPerguntas} /> : <PerguntaFechada pergunta={p} posicao={i} perguntas={perguntas} setPerguntas={setPerguntas} />)}
         </>
     )
 }
@@ -66,7 +73,8 @@ font-style: normal;
 font-weight: 700;
 font-size: 16px;
 line-height: 19px;
-color: #333333;
+color: ${props => props.pergunta.acertou === true ? '#2FBE34' : (props.pergunta.acertou === 'quase' ? '#FF922E' : (props.pergunta.feita ? '#FF3030' : '#333333'))};
+text-decoration: ${props => props.pergunta.feita ? 'line-through': ''}
 }
 
 ion-icon {

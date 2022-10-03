@@ -4,36 +4,44 @@ export default function Footer({perguntas, setPerguntas}) {
 
     function feita() {
         for (let p in perguntas) {
-            if (perguntas[p].aberta) {
+            if (perguntas[p].mostraResposta) {
                 perguntas[p].feita = true
+                perguntas[p].aberta = false
             }
         }
         setPerguntas([...perguntas])
     }
 
     function acerta() {
-        
+        for (let p in perguntas) {
+            if (perguntas[p].aberta) {
+                perguntas[p].acertou = true
+            }
+        }
         feita()
     }
 
     function quase() {
-        
+        for (let p in perguntas) {
+            if (perguntas[p].aberta) {
+                perguntas[p].acertou = 'quase'
+            }
+        }
         feita()
     }
 
     function erra() {
-
         feita()
     }
 
     return (
         <FooterWrapper>
             <div>
-                <button onClick={erra}>Não lembrei</button>
-                <button onClick={quase}>Quase não lembrei</button>
-                <button onClick={acerta}>Zap!</button>
+                <button data-identifier="forgot-btn" onClick={erra}>Não lembrei</button>
+                <button data-identifier="almost-forgot-btn" onClick={quase}>Quase não lembrei</button>
+                <button data-identifier="zap-btn" onClick={acerta}>Zap!</button>
             </div>
-            <p>{`${perguntas.filter(p => p.feita).length}/${perguntas.length} CONCLUÍDOS`}</p>
+            <p data-identifier="flashcard-counter">{`${perguntas.filter(p => p.feita).length}/${perguntas.length} CONCLUÍDOS`}</p>
         </FooterWrapper>
     )
 }

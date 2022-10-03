@@ -12,6 +12,7 @@ export default function App() {
 
     return (
         <ContainerApp>
+            {console.log(perguntas)}
             <GlobalStyle />
             <LogoContainer />
             <PerguntasContainer perguntas={perguntas} setPerguntas={setPerguntas} />
